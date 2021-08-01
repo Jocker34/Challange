@@ -1,0 +1,50 @@
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: #f8f8f8;
+}
+
+.App {
+  font-family: sans-serif;
+  margin: 2em;
+  height: 100%;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.single-input {
+  display: flex;
+  justify-content: space-between;
+  width: 225px;
+  align-items: center;
+  height: 35px;
+}
+
+.currency-source {
+  width: 25px;
+  height: 20px;
+}
+
+.currency-destination {
+  width: 25px;
+  height: 20px;
+}
+
+.currency-date {
+  width: 75px;
+  height: 20px;
+}
+
+.find-rate {
+  margin-right: 10px;
+}
+
+.conversion-result {
+  margin-top: 10px;
+}
