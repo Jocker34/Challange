@@ -20,7 +20,6 @@ export default class CurrencyConverter extends React.Component {
       const resp = await axios.get(`http://api.exchangeratesapi.io/v1/${this.state.date}`, {
         params: {
           access_key: 'ca00a5e307732f94d27adece0a5bfb21',
-          symbols: `${this.state.source},${this.state.destination}`
         },
       });
       console.log(resp)
@@ -30,12 +29,7 @@ export default class CurrencyConverter extends React.Component {
       this.calculations(this.state.source, this.state.destination);
     } catch (err) {
       console.error(err)
-      if (err.response.data.error.code === 'invalid_currency_codes') {
-        this.setState({result: `Symbols ${this.state.destination} are invalid for date ${this.state.date}.`})
-      }
-      if (err.response.data.error.code === 'invalid_date') {
-        this.setState({result: `time data '${this.state.date}' does not match format '%Y-%m-%d'`})
-      }
+      this.setState({result: err.response.data.error.message})
     }
   };
 
@@ -48,12 +42,17 @@ export default class CurrencyConverter extends React.Component {
     return false
   }
 
-  validateSymbols = (firstSymbol) => {
+  validateSymbols = (firstSymbol, secoundSymbol) => {
     const responeAPI = Object.keys(this.state.dataFromApi.rates)
     const responseFirst = `Base ${firstSymbol} is not supported.`
+    const responseSecound = `Symbols '${secoundSymbol}' are invalid for date ${this.state.date}`
     if (!responeAPI.find(e => e === firstSymbol)) {
       this.setState({ result: responseFirst })
       return responseFirst
+    }
+    if (!responeAPI.find(e => e === secoundSymbol)) {
+      this.setState({ result: responseSecound })
+      return responseSecound
     }
     return ''
   }
