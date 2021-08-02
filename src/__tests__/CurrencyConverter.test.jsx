@@ -3,7 +3,7 @@ import Enzyme, { mount, shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import sinon from "sinon";
 import mockAxios from "axios";
-import CurrencyConverter from "../src/CurrencyConverter";
+import CurrencyConverter from "../CurrencyConverter";
 Enzyme.configure({ adapter: new Adapter() });
 
 describe("CurrencyConverter", () => {
@@ -266,6 +266,8 @@ describe("CurrencyConverter", () => {
       findRate.simulate("click");
       await new Promise(setImmediate);
       expect(mockAxios.get).toHaveBeenCalledTimes(1);
+      console.log('CALY RESULT',result.debug())
+      console.log('JAKIES GOWNO',result.text)
       expect(result.text()).toEqual(expected);
     });
     

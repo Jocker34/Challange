@@ -22,6 +22,8 @@ export default class CurrencyConverter extends React.Component {
       });
       console.log(resp)
       this.setState({ dataFromApi: resp.data })
+      let isError = this.validate()
+      if (!isError) return false
       this.calculations(this.state.source, this.state.destination);
     } catch (err) {
       // Handle Error Here
@@ -36,13 +38,13 @@ export default class CurrencyConverter extends React.Component {
       this.setState({ result: reponse })
       return reponse
     }
-    return ''
+    return false
   }
 
   validateSymbols = (firstSymbol, secoundSymbol) => {
-    const responeAPI = Object.keys(test.rates)
-    const responseFirst = `Symbols ${firstSymbol} are invalid for date`
-    const responseSecound = `Symbols ${secoundSymbol} are invalid for date`
+    const responeAPI = Object.keys(this.state.dataFromApi.rates)
+    const responseFirst = `Base ${firstSymbol} is not supported.`
+    const responseSecound = `Symbols ${secoundSymbol} are invalid for date ${this.state.date}.`
     if (!responeAPI.find(e => e === firstSymbol)) {
       this.setState({ result: responseFirst })
       return responseFirst
@@ -57,7 +59,7 @@ export default class CurrencyConverter extends React.Component {
   validateDate = date => {
     const regex = /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/
 
-    const response = 'time data is not valid'
+    const response = `time data '${this.state.date}' does not match format '%Y-%m-%d'`
 
     if (!regex.test(date)) {
       this.setState({ result: response })
@@ -66,14 +68,17 @@ export default class CurrencyConverter extends React.Component {
   }
 
   validate = () => {
-    let isError = this.validateField(this.state.source, this.state.destination, this.state.date)
-    if (isError) return false
-    isError = this.validateSymbols(this.state.source, this.state.destination)
+    let isError = this.validateSymbols(this.state.source, this.state.destination)
     if (isError) return false
     isError = this.validateDate(this.state.date)
     if (isError) return false
-    this.sendGetRequest()
+    return true
+  }
 
+  validateInputs = () => {
+    let isError = this.validateField(this.state.source, this.state.destination, this.state.date)
+    if (isError) return false
+    this.sendGetRequest()
   }
 
   resetAllFields = () => {
@@ -105,7 +110,7 @@ export default class CurrencyConverter extends React.Component {
               type="text"
               value={this.state.source}
               maxLength="3"
-              onChange={e => this.setState({ source: e.target.value.substr(0, 3).toUpperCase().replace(/[^a-zA-Z]/ig,'') })}
+              onChange={e => this.setState({ source: e.target.value.substr(0, 3).toUpperCase().replace(/[^a-zA-Z]/ig, '') })}
               placeholder='USD'
             />
           </div>
@@ -116,7 +121,7 @@ export default class CurrencyConverter extends React.Component {
               type="text"
               value={this.state.destination}
               maxLength="3"
-              onChange={e => this.setState({ destination: e.target.value.substr(0, 3).toUpperCase().replace(/[^a-zA-Z]/ig,'') })}
+              onChange={e => this.setState({ destination: e.target.value.substr(0, 3).toUpperCase().replace(/[^a-zA-Z]/ig, '') })}
               placeholder='EUR'
             />
           </div>
@@ -127,7 +132,7 @@ export default class CurrencyConverter extends React.Component {
               type="text"
               maxLength="10"
               value={this.state.date}
-              onChange={e => this.setState({ date: e.target.value.substr(0, 10).replace(/[^0-9+-]/ig,'')})}
+              onChange={e => this.setState({ date: e.target.value.substr(0, 10).replace(/[^0-9+-]/ig, '') })}
               placeholder='YYYY-MM-DD'
             />
           </div>
@@ -135,7 +140,7 @@ export default class CurrencyConverter extends React.Component {
 
         <button
           className="find-rate"
-          onClick={this.validate}
+          onClick={this.validateInputs}
         >
           Find rate
         </button>
@@ -145,7 +150,9 @@ export default class CurrencyConverter extends React.Component {
         >
           Reset
         </button>
-        <div className="conversion-result">{this.state.result}</div>
+        <div className="conversion-result">
+          {this.state.result}
+        </div>
       </>
     );
   }
