@@ -5,86 +5,99 @@ export default class CurrencyConverter extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      source: '',
-      destination: '',
-      date: '',
-      result: '',
-      symbols: '',
-      dataFromApi: ''
-    }
-
+      source: "",
+      destination: "",
+      date: "",
+      result: "",
+      symbols: "",
+      dataFromApi: "",
+    };
   }
 
   sendGetRequest = async () => {
     try {
-      const resp = await axios.get(`http://api.exchangeratesapi.io/v1/${this.state.date}`, {
-        params: {
-          access_key: 'ca00a5e307732f94d27adece0a5bfb21',
-        },
-      });
-      console.log(resp)
-      this.setState({ dataFromApi: resp.data })
-      let isError = this.validate()
-      if (!isError) return false
+      const resp = await axios.get(
+        `http://api.exchangeratesapi.io/v1/${this.state.date}`,
+        {
+          params: {
+            access_key: "ca00a5e307732f94d27adece0a5bfb21",
+          },
+        }
+      );
+      console.log(resp);
+      this.setState({ dataFromApi: resp.data });
+      let isError = this.validate();
+      if (!isError) return false;
       this.calculations(this.state.source, this.state.destination);
     } catch (err) {
-      console.error(err)
-      this.setState({result: err.response.data.error.message})
+      console.error(err);
+      this.setState({ result: err.response.data.error.message });
     }
   };
 
-  validateField = (firstSymbol, secoundSymbol, date) => {
-    const reponse = "Please complete each field"
-    if (firstSymbol.length < 3 || secoundSymbol.length < 3 || date.length < 10) {
-      this.setState({ result: reponse })
-      return reponse
+  validateField = (firstSymbol, secondSymbol, date) => {
+    const response = "Please complete each field";
+    if (
+      firstSymbol.length < 3 ||
+      secondSymbol.length < 3 ||
+      date.length < 10
+    ) {
+      this.setState({ result: response });
+      return response;
     }
-    return false
-  }
+    return false;
+  };
 
-  validateSymbols = (firstSymbol, secoundSymbol) => {
-    const responeAPI = Object.keys(this.state.dataFromApi.rates)
-    const responseFirst = `Base ${firstSymbol} is not supported.`
-    const responseSecound = `Symbols '${secoundSymbol}' are invalid for date ${this.state.date}`
-    if (!responeAPI.find(e => e === firstSymbol)) {
-      this.setState({ result: responseFirst })
-      return responseFirst
+  validateSymbols = (firstSymbol, secondSymbol) => {
+    const responseAPI = Object.keys(this.state.dataFromApi.rates);
+    const responseFirst = `Base ${firstSymbol} is not supported.`;
+    const responseSecond = `Symbols '${secondSymbol}' are invalid for date ${this.state.date}`;
+    if (!responseAPI.find((e) => e === firstSymbol)) {
+      this.setState({ result: responseFirst });
+      return responseFirst;
     }
-    if (!responeAPI.find(e => e === secoundSymbol)) {
-      this.setState({ result: responseSecound })
-      return responseSecound
+    if (!responseAPI.find((e) => e === secondSymbol)) {
+      this.setState({ result: responseSecond });
+      return responseSecond;
     }
-    return ''
-  }
+    return "";
+  };
 
   validate = () => {
-    let isError = this.validateSymbols(this.state.source, this.state.destination)
-    if (isError) return false
-    return true
-  }
+    let isError = this.validateSymbols(
+      this.state.source,
+      this.state.destination
+    );
+    if (isError) return false;
+    return true;
+  };
 
   validateInputs = () => {
-    let isError = this.validateField(this.state.source, this.state.destination, this.state.date)
-    if (isError) return false
-    this.sendGetRequest()
-  }
+    let isError = this.validateField(
+      this.state.source,
+      this.state.destination,
+      this.state.date
+    );
+    if (isError) return false;
+    this.sendGetRequest();
+  };
 
   resetAllFields = () => {
     this.setState({
-      source: '',
-      destination: '',
-      date: '',
-      result: '',
-      symbols: '',
-      dataFromApi: ''
-    })
-  }
+      source: "",
+      destination: "",
+      date: "",
+      result: "",
+      symbols: "",
+      dataFromApi: "",
+    });
+  };
 
   calculations = (source, destination) => {
-    const firstSymbol = this.state.dataFromApi.rates[source]
-    const secoundSymnbol = this.state.dataFromApi.rates[destination]
-    this.setState({ result: secoundSymnbol / firstSymbol })
-  }
+    const firstSymbol = this.state.dataFromApi.rates[source];
+    const secondSymnbol = this.state.dataFromApi.rates[destination];
+    this.setState({ result: secondSymnbol / firstSymbol });
+  };
 
   render() {
     return (
@@ -98,8 +111,15 @@ export default class CurrencyConverter extends React.Component {
               type="text"
               value={this.state.source}
               maxLength="3"
-              onChange={e => this.setState({ source: e.target.value.substr(0, 3).toUpperCase().replace(/[^a-zA-Z]/ig, '') })}
-              placeholder='USD'
+              onChange={(e) =>
+                this.setState({
+                  source: e.target.value
+                    .substr(0, 3)
+                    .toUpperCase()
+                    .replace(/[^a-zA-Z]/gi, ""),
+                })
+              }
+              placeholder="USD"
             />
           </div>
           <div className="single-input">
@@ -109,38 +129,41 @@ export default class CurrencyConverter extends React.Component {
               type="text"
               value={this.state.destination}
               maxLength="3"
-              onChange={e => this.setState({ destination: e.target.value.substr(0, 3).toUpperCase().replace(/[^a-zA-Z]/ig, '') })}
-              placeholder='EUR'
+              onChange={(e) =>
+                this.setState({
+                  destination: e.target.value
+                    .substr(0, 3)
+                    .toUpperCase()
+                    .replace(/[^a-zA-Z]/gi, ""),
+                })
+              }
+              placeholder="EUR"
             />
           </div>
           <div className="single-input">
             <p>Date</p>
             <input
-              className='currency-date'
+              className="currency-date"
               type="text"
               maxLength="10"
               value={this.state.date}
-              onChange={e => this.setState({ date: e.target.value.substr(0, 10).replace(/[^0-9+-]/ig, '') })}
-              placeholder='YYYY-MM-DD'
+              onChange={(e) =>
+                this.setState({
+                  date: e.target.value.substr(0, 10).replace(/[^0-9+-]/gi, ""),
+                })
+              }
+              placeholder="YYYY-MM-DD"
             />
           </div>
         </div>
 
-        <button
-          className="find-rate"
-          onClick={this.validateInputs}
-        >
+        <button className="find-rate" onClick={this.validateInputs}>
           Find rate
         </button>
-        <button
-          className="reset-fields"
-          onClick={this.resetAllFields}
-        >
+        <button className="reset-fields" onClick={this.resetAllFields}>
           Reset
         </button>
-        <div className="conversion-result">
-          {this.state.result}
-        </div>
+        <div className="conversion-result">{this.state.result}</div>
       </>
     );
   }
