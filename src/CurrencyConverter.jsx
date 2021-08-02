@@ -95,8 +95,8 @@ export default class CurrencyConverter extends React.Component {
 
   calculations = (source, destination) => {
     const firstSymbol = this.state.dataFromApi.rates[source];
-    const secondSymnbol = this.state.dataFromApi.rates[destination];
-    this.setState({ result: secondSymnbol / firstSymbol });
+    const secondSymbol = this.state.dataFromApi.rates[destination];
+    this.setState({ result: secondSymbol / firstSymbol });
   };
 
   render() {
