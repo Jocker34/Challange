@@ -18,7 +18,10 @@ export default class CurrencyConverter extends React.Component {
   sendGetRequest = async () => {
     try {
       const resp = await axios.get(`http://api.exchangeratesapi.io/v1/${this.state.date}`, {
-        params: { access_key: 'ca00a5e307732f94d27adece0a5bfb21' },
+        params: {
+          access_key: 'ca00a5e307732f94d27adece0a5bfb21',
+          symbols: `${this.state.source},${this.state.destination}`
+        },
       });
       console.log(resp)
       this.setState({ dataFromApi: resp.data })
@@ -26,11 +29,15 @@ export default class CurrencyConverter extends React.Component {
       if (!isError) return false
       this.calculations(this.state.source, this.state.destination);
     } catch (err) {
-      // Handle Error Here
-      console.error(err);
+      console.error(err)
+      if (err.response.data.error.code === 'invalid_currency_codes') {
+        this.setState({result: `Symbols ${this.state.destination} are invalid for date ${this.state.date}.`})
+      }
+      if (err.response.data.error.code === 'invalid_date') {
+        this.setState({result: `time data '${this.state.date}' does not match format '%Y-%m-%d'`})
+      }
     }
   };
-
 
   validateField = (firstSymbol, secoundSymbol, date) => {
     const reponse = "Please complete each field"
@@ -41,36 +48,18 @@ export default class CurrencyConverter extends React.Component {
     return false
   }
 
-  validateSymbols = (firstSymbol, secoundSymbol) => {
+  validateSymbols = (firstSymbol) => {
     const responeAPI = Object.keys(this.state.dataFromApi.rates)
     const responseFirst = `Base ${firstSymbol} is not supported.`
-    const responseSecound = `Symbols ${secoundSymbol} are invalid for date ${this.state.date}.`
     if (!responeAPI.find(e => e === firstSymbol)) {
       this.setState({ result: responseFirst })
       return responseFirst
     }
-    if (!responeAPI.find(e => e === secoundSymbol)) {
-      this.setState({ result: responseSecound })
-      return responseSecound
-    }
     return ''
-  }
-
-  validateDate = date => {
-    const regex = /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/
-
-    const response = `time data '${this.state.date}' does not match format '%Y-%m-%d'`
-
-    if (!regex.test(date)) {
-      this.setState({ result: response })
-      return response
-    }
   }
 
   validate = () => {
     let isError = this.validateSymbols(this.state.source, this.state.destination)
-    if (isError) return false
-    isError = this.validateDate(this.state.date)
     if (isError) return false
     return true
   }

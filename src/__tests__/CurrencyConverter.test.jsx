@@ -266,8 +266,6 @@ describe("CurrencyConverter", () => {
       findRate.simulate("click");
       await new Promise(setImmediate);
       expect(mockAxios.get).toHaveBeenCalledTimes(1);
-      console.log('CALY RESULT',result.debug())
-      console.log('JAKIES GOWNO',result.text)
       expect(result.text()).toEqual(expected);
     });
     
